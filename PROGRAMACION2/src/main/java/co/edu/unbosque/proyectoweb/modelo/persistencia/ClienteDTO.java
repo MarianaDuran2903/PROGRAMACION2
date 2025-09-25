@@ -1,16 +1,37 @@
 package co.edu.unbosque.proyectoweb.modelo.persistencia;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(
+    name = "clientes",
+    uniqueConstraints = @UniqueConstraint(name = "uk_clientes_identificacion", columnNames = "identificacion")
+)
 public class ClienteDTO implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 20, unique = true)
     private String identificacion;
+
+    @Column(nullable = false, length = 100)
     private String nombres;
+
+    @Column(nullable = false, length = 100)
     private String apellidos;
+
+    @Column(length = 120)
     private String email;
+
+    @Column(length = 30)
     private String telefono;
 
-    // Getters y setters
+    public ClienteDTO() {}
+
+    // --- Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

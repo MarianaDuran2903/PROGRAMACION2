@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+</h:head>
+
+<h:body>
+
+
+    <h:form id="frm">
+        <p:growl id="growl" showDetail="true" life="3500" />
+
+        <!-- Filtros -->
+        <h:panelGrid columns="5" style="width:100%" columnClasses="lbl,inp,spc,lbl,inp" cellpadding="6">
+            <h:outputLabel for="codTx" value="Código Transacción" />
+            <p:inputText id="codTx" value="#{busquedaBean.codigoTransaccion}" placeholder="Ej: AB12..." />
+
+            <h:outputText value="" /> <!-- separador visual -->
+
+            <h:outputLabel for="est" value="Estado Transacción" />
+            <p:selectOneMenu id="est" value="#{busquedaBean.estadoTransaccion}" style="min-width:220px">
+                <f:selectItem itemLabel="-- Todos --" itemValue="" />
+                <f:selectItem itemLabel="APROBADA" itemValue="APROBADA" />
+                <f:selectItem itemLabel="RECHAZADA" itemValue="RECHAZADA" />
+            </p:selectOneMenu>
+        </h:panelGrid>
+
+        <div style="margin-top:8px; display:flex; gap:.5rem; justify-content:flex-end">
+            <p:commandButton value="Buscar" icon="pi pi-search"
+                             actionListener="#{busquedaBean.buscar}"
+                             update="tablaPagos growl" />
+            <p:commandButton value="Limpiar" icon="pi pi-times"
+                             styleClass="ui-button-secondary ui-button-flat"
+                             actionListener="#{busquedaBean.limpiar}"
+                             update="@form" />
+        </div>
+
+        <p:separator/>
+                                            <!-- Tabla principal -->
+        <p:dataTable id="tablaPagos"
+                     var="p"
+                     value="#{busquedaBean.pagos}"
+                     rows="8" paginator="true"
+                     rowKey="#{p.id}"
+                     emptyMessage="Sin resultados">
+
+            <p:column headerText="ID Pago" style="width:120px">
+                <h:outputText value="#{p.id}"/>
+            </p:column>
+
+            <p:column headerText="Nombre Pagador">
+                <h:outputText value="#{p.nombreCompletoCliente}"/>
+            </p:column>
+
+            <p:column headerText="Nombre Comercio">
+                <h:outputText value="#{p.comercio}"/>
+            </p:column>
+
+            <p:column headerText="Valor Total Compra" style="text-align:right; width:140px">
+                <h:outputText value="#{p.total}">
+                    <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Número Tarjeta" style="width:160px">
+                <h:outputText value="#{p.numeroTarjetaEnmascarado}"/>
+            </p:column>
+
+            <p:column headerText="Código Transacción" style="width:160px">
+                <h:outputText value="#{p.codigoTransaccion}"/>
+            </p:column>
+
+            <p:column headerText="Estado Transacción" style="text-align:center; width:160px">
+                <p:badge value="#{p.estado}"
+                         severity="#{p.estado eq 'APROBADA' ? 'success' : 'danger'}"/>
+            </p:column>
+
+            <p:column headerText="Fecha-Hora Transacción" style="width:190px">
+                <h:outputText value="#{p.fechaHora}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="# Cuotas" style="text-align:center; width:90px">
+                <h:outputText value="#{p.numeroCuotas}"/>
+            </p:column>
+
+            <p:column headerText="Acciones" style="width:260px" styleClass="acciones">
+                <p:commandButton value="Calcular Cuotas" icon="pi pi-calculator"
+                                 styleClass="ui-button-warning ui-button-flat"
+                                 actionListener="#{busquedaBean.abrirDialogoCuotas(p.id)}"
+                                 process="@this"
+                                 update=":dlgCuotasForm"
+                                 rendered="#{p.numeroCuotas gt 1}"/>
+
+                <p:commandButton value="Ver Comprobante" icon="pi pi-file"
+                                 styleClass="ui-button-help ui-button-flat"
+                                 actionListener="#{busquedaBean.abrirDialogoComprobante(p.id)}"
+                                 process="@this"
+                                 update=":dlgComprobanteForm"/>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+
+    <!-- ====== DIALOGO CALCULAR CUOTAS ====== -->
+    <p:dialog header="Calculo Cuotas" widgetVar="dlgCalcularCuotas"
+              modal="true" resizable="false" width="760">
+        <h:form id="dlgCuotasForm">
+            <h:panelGrid columns="4" style="width:100%" cellpadding="4">
+                <h:outputText value="Valor Pagado"/>
+                <h:outputText value="#{busquedaBean.valorPagadoCuotas}">
+                    <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                </h:outputText>
+
+                <h:outputText value="# Cuotas"/>
+                <h:outputText value="#{busquedaBean.numeroCuotasSeleccionadas}"/>
+            </h:panelGrid>
+
+            <p:separator/>
+
+            <p:dataTable value="#{busquedaBean.tablaCuotas}" var="c" rows="12" paginator="true"
+                         emptyMessage="Sin cuotas">
+                <p:column headerText="#Cuota" style="width:80px; text-align:center">
+                    <h:outputText value="#{c.numero}"/>
+                </p:column>
+                <p:column headerText="Valor a Pagar" style="text-align:right">
+                    <h:outputText value="#{c.valorAPagar}">
+                        <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Abono a Capital" style="text-align:right">
+                    <h:outputText value="#{c.abonoCapital}">
+                        <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Intereses" style="text-align:right">
+                    <h:outputText value="#{c.intereses}">
+                        <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Saldo" style="text-align:right">
+                    <h:outputText value="#{c.saldo}">
+                        <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+
+            <p:separator/>
+
+            <p:commandButton value="Cerrar" icon="pi pi-times" type="button"
+                             styleClass="ui-button-secondary ui-button-flat"
+                             onclick="PF('dlgCalcularCuotas').hide();"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ====== DIALOGO COMPROBANTE ====== -->
+    <p:dialog header="Comprobante de Pago" widgetVar="dlgComprobante"
+              modal="true" resizable="false" width="620">
+        <h:form id="dlgComprobanteForm">
+            <h:panelGrid columns="2" style="width:100%" cellpadding="5">
+                <h:outputText value="Cliente"/>
+                <h:outputText value="#{busquedaBean.pagoSeleccionado.nombreCompletoCliente}"/>
+
+                <h:outputText value="Comercio"/>
+                <h:outputText value="#{busquedaBean.pagoSeleccionado.comercio}"/>
+
+                <h:outputText value="Estado"/>
+                <p:badge value="#{busquedaBean.pagoSeleccionado.estado}"
+                         severity="#{busquedaBean.pagoSeleccionado.estado eq 'APROBADA' ? 'success' : 'danger'}"/>
+
+                <h:outputText value="Código Transacción"/>
+                <h:outputText value="#{busquedaBean.pagoSeleccionado.codigoTransaccion}"/>
+
+                <h:outputText value="Fecha"/>
+                <h:outputText value="#{busquedaBean.pagoSeleccionado.fechaHora}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                </h:outputText>
+
+                <h:outputText value="Total"/>
+                <h:outputText value="#{busquedaBean.pagoSeleccionado.total}">
+                    <f:convertNumber type="currency" currencySymbol="$ " locale="es_CO"/>
+                </h:outputText>
+            </h:panelGrid>
+
+            <p:separator/>
+            <p:commandButton value="Cerrar" icon="pi pi-times" type="button"
+                             styleClass="ui-button-secondary ui-button-flat"
+                             onclick="PF('dlgComprobante').hide();"/>
+        </h:form>
+    </p:dialog>
+
+
+</h:body>
+</html>

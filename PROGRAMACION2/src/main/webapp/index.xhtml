@@ -42,7 +42,12 @@
         </div>
 
         <p:separator/>
-                                            <!-- Tabla principal -->
+        <h:form>
+            <h:commandButton value="Crear nuevo cliente" action="cliente?faces-redirect=true"/>
+        </h:form>
+        <p:separator/>
+
+        <!-- Tabla principal -->
         <p:dataTable id="tablaPagos"
                      var="p"
                      value="#{busquedaBean.pagos}"

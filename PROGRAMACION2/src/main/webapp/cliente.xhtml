@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Crear cliente</title>
+</h:head>
+<h:body>
+    <h1>Nuevo cliente</h1>
+
+    <!-- Este form se conectará al bean en el siguiente paso -->
+    <h:form id="frmCliente">
+        <h:panelGrid columns="2" cellpadding="6">
+
+            <h:outputLabel for="ident" value="Identificación"/>
+            <h:inputText id="ident" value="#{clienteFormBean.cliente.identificacion}" required="true"/>
+
+            <h:outputLabel for="nombres" value="Nombres"/>
+            <h:inputText id="nombres" value="#{clienteFormBean.cliente.nombres}" required="true"/>
+
+            <h:outputLabel for="apellidos" value="Apellidos"/>
+            <h:inputText id="apellidos" value="#{clienteFormBean.cliente.apellidos}" required="true"/>
+
+            <h:outputLabel for="email" value="Email"/>
+            <h:inputText id="email" value="#{clienteFormBean.cliente.email}"/>
+
+            <h:outputLabel for="tel" value="Teléfono"/>
+            <h:inputText id="tel" value="#{clienteFormBean.cliente.telefono}"/>
+        </h:panelGrid>
+
+        <h:commandButton value="Guardar" action="#{clienteFormBean.guardar}"/>
+        <h:link outcome="index" value="Cancelar"/>
+    </h:form>
+</h:body>
+</html>

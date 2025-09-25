@@ -9,4 +9,5 @@ public interface ClienteDAO {
     Cliente findById(Long id);
     Cliente findByIdentificacion(String identificacion);
     List<Cliente> listar();
+    Long insertar(ClienteDTO cliente) throws Exception;
 }

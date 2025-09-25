@@ -11,4 +11,5 @@ public interface IservicioCliente {
     ClienteDTO obtenerPorId(Long id) throws EntidadNoEncontradaException;
     ClienteDTO obtenerPorIdentificacion(String identificacion);
     List<ClienteDTO> listar();
+    Long crear(ClienteDTO cliente) throws Exception;
 }

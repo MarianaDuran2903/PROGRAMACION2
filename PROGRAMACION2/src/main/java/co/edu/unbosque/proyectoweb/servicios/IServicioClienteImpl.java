@@ -60,4 +60,15 @@ public class IServicioClienteImpl implements IservicioCliente {
         for (Cliente c : entidades) salida.add(mapper.map(c, ClienteDTO.class));
         return salida;
     }
+
+    @Override
+    public Long crear(ClienteDTO cliente) throws Exception {
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente requerido");
+        }
+        if (cliente.getIdentificacion() == null || cliente.getIdentificacion().isBlank()) {
+            throw new IllegalArgumentException("Identificación requerida");
+        }
+        return clienteDAO.insertar(cliente);
+    }
 }

@@ -39,4 +39,12 @@ public class ClienteDAOImpl implements ClienteDAO {
     public List<Cliente> listar() {
         return em.createNamedQuery("Cliente.listar", Cliente.class).getResultList();
     }
+
+    @Override
+    @Transactional
+    public Long insertar(ClienteDTO cliente) throws Exception {
+        em.persist(cliente);
+        em.flush();
+        return cliente.getId();
+    }
 }

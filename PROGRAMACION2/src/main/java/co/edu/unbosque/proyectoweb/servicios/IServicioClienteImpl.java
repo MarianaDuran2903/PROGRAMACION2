@@ -62,13 +62,29 @@ public class IServicioClienteImpl implements IservicioCliente {
     }
 
     @Override
-    public Long crear(ClienteDTO cliente) throws Exception {
-        if (cliente == null) {
-            throw new IllegalArgumentException("Cliente requerido");
-        }
-        if (cliente.getIdentificacion() == null || cliente.getIdentificacion().isBlank()) {
+    public Long crear(ClienteDTO dto) throws Exception {
+        validar(dto);
+        Cliente entity = toEntity(dto);
+        return clienteDAO.insertar(entity);
+    }
+
+    private void validar(ClienteDTO c) {
+        if (c == null) throw new IllegalArgumentException("Cliente requerido");
+        if (c.getIdentificacion() == null || c.getIdentificacion().isBlank())
             throw new IllegalArgumentException("Identificación requerida");
-        }
-        return clienteDAO.insertar(cliente);
+        if (c.getNombres() == null || c.getNombres().isBlank())
+            throw new IllegalArgumentException("Nombres requeridos");
+        if (c.getApellidos() == null || c.getApellidos().isBlank())
+            throw new IllegalArgumentException("Apellidos requeridos");
+    }
+
+    private Cliente toEntity(ClienteDTO dto) {
+        Cliente e = new Cliente();
+        e.setIdentificacion(dto.getIdentificacion());
+        e.setNombres(dto.getNombres());
+        e.setApellidos(dto.getApellidos());
+        e.setEmail(dto.getEmail());
+        e.setTelefono(dto.getTelefono());
+        return e;
     }
 }
